@@ -76,6 +76,15 @@ header > h1 {
     color: #4d5c76;
     margin-bottom: 5px;
     position: relative;
+    transition: opacity .5s ease-in-out;
+}
+
+.card.dragging {
+    opacity: .4;
+}
+
+.card.dragging :where(.card__header, i){
+    opacity: .2;
 }
 
 .card__header {

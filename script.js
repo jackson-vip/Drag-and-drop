@@ -11,12 +11,26 @@ let draggedCard = null;
 // O dragStart é chamado quando o usuário começa a arrastar um elemento
 const dragStart = (event) => {
     draggedCard = event.target;
+    draggedCard.classList.add('dragging');
+    
     event.dataTransfer.effectAllowed = 'move';
 };
 
 // O dragOver é chamado quando um elemento arrastado entra na área de destino
 const dragOver = (event) => {
     event.preventDefault();
+    const draggingItem = document.querySelector(".dragging");
+    const column = event.currentTarget;
+    const siblings = [...column.querySelectorAll(".card:not(.dragging)")];
+    const nextSibling = siblings.find(sibling => {
+        return event.clientY <= sibling.offsetTop + sibling.offsetHeight / 2;
+    })
+    
+    // A variável columnIndex armazena o índice da coluna onde o elemento está sendo arrastado
+    const columnIndex = Array.from(columns).indexOf(column);    
+    columns[columnIndex].insertBefore(draggingItem, nextSibling);
+    
+    // column.insertBefore(draggingItem, nextSibling);
 };
 
 // O dragEnter é chamado quando um elemento arrastado entra na área de destino
@@ -42,6 +56,13 @@ const drop = ({ target }) => {
         target.append(draggedCard);
         updateCardCount();
     }
+
+    console.log(target);
+    console.log(target.classList.contains('dragging'));
+}
+
+const dragEnd = ({target}) =>{
+    target.classList.remove('dragging')
 }
 
 const createCard = ({ target }) => {
@@ -75,7 +96,7 @@ const createCard = ({ target }) => {
         newCard.addEventListener('dblclick', () => {
             newCard.contentEditable = 'true';
             newCard.focus();
-        });
+        });dragEnd
     });
     target.append(newCard);
     newCard.addEventListener('dragstart', dragStart);
@@ -113,4 +134,5 @@ columns.forEach((column, index) => {
     column.addEventListener('dragleave', dragLeave);
     column.addEventListener('drop', drop);
     column.addEventListener('dblclick', (index == 0) ? createCard : null);
+    column.addEventListener('dragend', dragEnd)
 });
